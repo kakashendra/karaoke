@@ -1,149 +1,181 @@
 <!DOCTYPE html>
-<html lang="ru"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Караоке</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#0b0618;--card:#150d2b;--tx:#f3ecff;--hint:#9a8bc0;--pink:#ff2e93;--cyan:#27e6ff;--vio:#7b3dff}
-*{box-sizing:border-box}
-html{color-scheme:dark}
-body{margin:0;padding:16px 14px 48px;color:var(--tx);font:16px/1.35 Manrope,system-ui,sans-serif;min-height:100vh;
-background:radial-gradient(120% 50% at 50% -8%,rgba(255,46,147,.35),transparent 60%),radial-gradient(90% 40% at 100% 18%,rgba(39,230,255,.14),transparent 60%),var(--bg)}
-header{text-align:center;padding:10px 0 6px}
-.sign{font:700 34px Unbounded,sans-serif;letter-spacing:.04em;color:#ffe3f3;
-text-shadow:0 0 4px #fff,0 0 12px var(--pink),0 0 28px var(--pink),0 0 56px var(--pink)}
-header .sub{margin-top:6px}
-h2{margin:26px 0 10px;font:500 15px Unbounded,sans-serif;color:var(--cyan);text-shadow:0 0 10px rgba(39,230,255,.7)}
-.card{background:var(--card);border:1px solid rgba(123,61,255,.35);border-radius:14px;padding:12px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.card.free{border-color:var(--cyan);box-shadow:0 0 14px rgba(39,230,255,.25),inset 0 0 12px rgba(39,230,255,.08)}
-.card.busy{border-color:var(--pink);box-shadow:0 0 14px rgba(255,46,147,.3),inset 0 0 12px rgba(255,46,147,.1)}
-.card.now{border-color:var(--pink);background:linear-gradient(90deg,rgba(255,46,147,.22),var(--card));box-shadow:0 0 22px rgba(255,46,147,.45);animation:glow 2.2s ease-in-out infinite}
-@keyframes glow{50%{box-shadow:0 0 34px rgba(255,46,147,.75)}}
-@media (prefers-reduced-motion:reduce){.card.now{animation:none}}
-.sub{color:var(--hint);font-size:13px;margin-top:2px}
-button{background:linear-gradient(135deg,var(--pink),var(--vio));color:#fff;border:0;border-radius:11px;padding:9px 14px;font:700 14px Manrope,sans-serif;white-space:nowrap;box-shadow:0 0 14px rgba(255,46,147,.45)}
-button:active{transform:scale(.97)}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-button.g{background:transparent;color:var(--cyan);box-shadow:none;border:1px solid rgba(39,230,255,.5)}
-button.big{width:100%;padding:14px;font-size:16px;margin-top:2px}
-input,select{width:100%;padding:12px;border-radius:11px;border:1px solid rgba(123,61,255,.5);background:#0f0820;color:var(--tx);font:16px Manrope,sans-serif;margin-bottom:10px}
-input::placeholder{color:var(--hint)}
-input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 12px rgba(39,230,255,.4)}
-.row{display:flex;gap:8px;align-items:center}
-</style></head>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <title>Караоке</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#0b0618;--card:#150d2b;--tx:#f3ecff;--hint:#9a8bc0;--pink:#ff2e93;--cyan:#27e6ff;--vio:#7b3dff}
+        *{box-sizing:border-box}
+        html{color-scheme:dark}
+        body{margin:0;padding:16px 14px 48px;color:var(--tx);font:16px/1.35 Manrope,system-ui,sans-serif;min-height:100vh;
+        background:radial-gradient(120% 50% at 50% -8%,rgba(255,46,147,.35),transparent 60%),radial-gradient(90% 40% at 100% 18%,rgba(39,230,255,.14),transparent 60%),var(--bg)}
+        header{text-align:center;padding:10px 0 6px}
+        .sign{font:700 34px Unbounded,sans-serif;letter-spacing:.04em;color:#ffe3f3;
+        text-shadow:0 0 4px #fff,0 0 12px var(--pink),0 0 28px var(--pink),0 0 56px var(--pink)}
+        header .sub{margin-top:6px}
+        h2{margin:26px 0 10px;font:500 15px Unbounded,sans-serif;color:var(--cyan);text-shadow:0 0 10px rgba(39,230,255,.7)}
+        .card{background:var(--card);border:1px solid rgba(123,61,255,.35);border-radius:14px;padding:12px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+        .card.free{border-color:var(--cyan);box-shadow:0 0 14px rgba(39,230,255,.25),inset 0 0 12px rgba(39,230,255,.08)}
+        .card.busy{border-color:var(--pink);box-shadow:0 0 14px rgba(255,46,147,.3),inset 0 0 12px rgba(255,46,147,.1)}
+        .card.now{border-color:var(--pink);background:linear-gradient(90deg,rgba(255,46,147,.22),var(--card));box-shadow:0 0 22px rgba(255,46,147,.45);animation:glow 2.2s ease-in-out infinite}
+        @keyframes glow{50%{box-shadow:0 0 34px rgba(255,46,147,.75)}}
+        @media (prefers-reduced-motion:reduce){.card.now{animation:none}}
+        .sub{color:var(--hint);font-size:13px;margin-top:2px}
+        button{background:linear-gradient(135deg,var(--pink),var(--vio));color:#fff;border:0;border-radius:11px;padding:9px 14px;font:700 14px Manrope,sans-serif;white-space:nowrap;box-shadow:0 0 14px rgba(255,46,147,.45)}
+        button:active{transform:scale(.97)}
+        button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+        button.g{background:transparent;color:var(--cyan);box-shadow:none;border:1px solid rgba(39,230,255,.5)}
+        button.big{width:100%;padding:14px;font-size:16px;margin-top:2px}
+        input,select{width:100%;padding:12px;border-radius:11px;border:1px solid rgba(123,61,255,.5);background:#0f0820;color:var(--tx);font:16px Manrope,sans-serif;margin-bottom:10px}
+        input::placeholder{color:var(--hint)}
+        input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 12px rgba(39,230,255,.4)}
+        .row{display:flex;gap:8px;align-items:center}
+    </style>
+</head>
 <body>
-<header><div class="sign">КАРАОКЕ</div><div class="sub">очередь и микрофоны</div></header>
-<div id="top"></div>
-<h2>Микрофоны</h2><div id="mics"></div>
-<h2>Очередь</h2><div id="q"></div>
-<h2>Добавить песню</h2>
-<input id="a" placeholder="Исполнитель"><input id="t" placeholder="Название песни">
-<select id="p"></select>
-<button class="big" onclick="add()">Добавить в очередь</button>
-<div id="adm"></div>
+    <header>
+        <div class="sign">КАРАОКЕ</div>
+        <div class="sub">очередь и микрофоны</div>
+    </header>
+    
+    <div id="top"></div>
+    <h2>Микрофоны</h2>
+    <div id="mics"></div>
+    <h2>Очередь</h2>
+    <div id="q"></div>
+    <h2>Добавить песню</h2>
+    <input id="a" placeholder="Исполнитель">
+    <input id="t" placeholder="Название песни">
+    <select id="p"></select>
+    <button class="big" onclick="add()">Добавить в очередь</button>
+    <div id="adm"></div>
 
-<script>
-// ===== НАСТРОЙКИ: впиши свои значения =====
-const CFG={URL:'https://qyzbjvvsdpuyyflcomjb.supabase.co/rest/v1/',KEY:'sb_publishable_-sn98t-WHmr3xb5LV6-MdA_kskRGEZF',ADMIN:772891654};
-// ==========================================
-const tg=Telegram.WebApp;tg.ready();tg.expand();try{tg.setHeaderColor('#0b0618');tg.setBackgroundColor('#0b0618')}catch(e){}
-const U=tg.initDataUnsafe.user||{id:1,first_name:'Тест'};
-const me={id:U.id,name:U.first_name+(U.last_name?' '+U.last_name:'')};
-const isAdmin=me.id===CFG.ADMIN;
-const db=supabase.createClient(CFG.URL,CFG.KEY);
-const $=id=>document.getElementById(id);
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let S={mics:2,songs:[],claims:[],users:[]};
+    <script>
+    // ===== ИНИЦИАЛИЗАЦИЯ TELEGRAM (должна быть строго сверху) =====
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    try {
+      tg.setHeaderColor('#0b0618');
+      tg.setBackgroundColor('#0b0618');
+    } catch(e){}
 
-async function load(){
-  const [s,so,m,u]=await Promise.all([
-    db.from('settings').select().eq('id',1).single(),
-    db.from('songs').select().in('status',['queue','singing']).order('id'),
-    db.from('mics').select(), db.from('users').select().order('name')]);
-  S={mics:s.data?.mic_count||2,songs:so.data||[],claims:m.data||[],users:u.data||[]};
-  render();
-}
+    // ===== НАСТРОЙКИ: впиши свои значения =====
+    const CFG={URL:'https://qyzbjvvsdpuyyflcomjb.supabase.co/rest/v1/',KEY:'sb_publishable_-sn98t-WHmr3xb5LV6-MdA_kskRGEZF',ADMIN:772891654};
+    // ==========================================
 
-function render(){
-  // приглашения на дуэт
-  $('top').innerHTML=S.songs.filter(x=>x.partner_id===me.id&&x.duet_status==='pending').map(x=>
-    `<div class="card now"><div>${esc(x.user_name)} зовёт тебя на дуэт<div class="sub">${esc(x.artist)} — ${esc(x.title)}</div></div>
-    <div class="row"><button onclick="ans(${x.id},1)">Да</button><button class="g" onclick="ans(${x.id},0)">Нет</button></div></div>`).join('');
+    const U = tg.initDataUnsafe.user || {id:1, first_name:'Тест'};
+    const me = {id:U.id, name:U.first_name+(U.last_name?' '+U.last_name:'')};
+    const isAdmin = me.id === CFG.ADMIN;
+    const db = supabase.createClient(CFG.URL, CFG.KEY);
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    let S = {mics:2, songs:[], claims:[], users:[]};
 
-  // микрофоны
-  let h='';
-  for(let i=1;i<=S.mics;i++){
-    const c=S.claims.find(x=>x.mic_no===i);
-    h+=`<div class="card ${c?'busy':'free'}"><div>Микрофон ${i}<div class="sub">${c?esc(c.name):'свободен'}</div></div>`+
-      (!c?`<button onclick="claim(${i})">Занять</button>`:
-       (c.user_id===me.id||isAdmin)?`<button class="g" onclick="free(${i})">Освободить</button>`:'')+`</div>`;
-  }
-  $('mics').innerHTML=h;
+    async function load(){
+      try {
+        const [s, so, m, u] = await Promise.all([
+          db.from('settings').select().eq('id',1).single(),
+          db.from('songs').select().in('status',['queue','singing']).order('id'),
+          db.from('mics').select(), 
+          db.from('users').select().order('name')
+        ]);
+        S = {mics:s.data?.mic_count||2, songs:so.data||[], claims:m.data||[], users:u.data||[]};
+        render();
+      } catch(e) {
+        console.error("Ошибка загрузки данных из Supabase:", e);
+      }
+    }
 
-  // очередь
-  $('q').innerHTML=S.songs.length?S.songs.map(x=>{
-    const who=esc(x.user_name)+(x.partner_name?' + '+esc(x.partner_name):'');
-    const tag=x.duet_status==='pending'?' · ждёт ответа партнёра':x.duet_status==='accepted'?' · дуэт':'';
-    const del=(x.user_id===me.id||isAdmin)?`<button class="g" onclick="del(${x.id})">Убрать</button>`:'';
-    return `<div class="card ${x.status==='singing'?'now':''}"><div>${x.status==='singing'?'Поёт сейчас: ':''}${esc(x.artist)} — ${esc(x.title)}<div class="sub">${who}${tag}</div></div>${del}</div>`;
-  }).join(''):'<div class="sub">Очередь пуста. Добавь первую песню.</div>';
+    function render(){
+      // приглашения на дуэт
+      $('top').innerHTML=S.songs.filter(x=>x.partner_id===me.id&&x.duet_status==='pending').map(x=>
+        `<div class="card now"><div>${esc(x.user_name)} зовёт тебя на дуэт<div class="sub">${esc(x.artist)} — ${esc(x.title)}</div></div>
+        <div class="row"><button onclick="ans(${x.id},1)">Да</button><button class="g" onclick="ans(${x.id},0)">Нет</button></div></div>`).join('');
 
-  // выбор партнёра (форма не перерисовывается, обновляем только список)
-  const used=(S.users.find(x=>x.id===me.id)||{}).duets_invited>=1;
-  const sel=$('p'),v=sel.value;
-  sel.innerHTML=`<option value="">Без дуэта</option>`+(used?'':S.users.filter(x=>x.id!==me.id).map(x=>`<option value="${x.id}">Дуэт с ${esc(x.name)}</option>`).join(''));
-  sel.value=v;sel.disabled=used;
-  if(used)sel.innerHTML=`<option value="">Дуэт уже использован</option>`;
+      // микрофоны
+      let h='';
+      for(let i=1;i<=S.mics;i++){
+        const c=S.claims.find(x=>x.mic_no===i);
+        h+=`<div class="card ${c?'busy':'free'}"><div>Микрофон ${i}<div class="sub">${c?esc(c.name):'свободен'}</div></div>`+
+          (!c?`<button onclick="claim(${i})">Занять</button>`:
+           (c.user_id===me.id||isAdmin)?`<button class="g" onclick="free(${i})">Освободить</button>`:'')+`</div>`;
+      }
+      $('mics').innerHTML=h;
 
-  // админ
-  $('adm').innerHTML=isAdmin?`<h2>Управление</h2>
-    <div class="card"><div>Микрофонов: ${S.mics}</div><div class="row"><button onclick="setMics(${S.mics-1})">−</button><button onclick="setMics(${S.mics+1})">+</button></div></div>
-    <button class="big" onclick="next()">Следующая песня</button>`:'';
-}
+      // очередь
+      $('q').innerHTML=S.songs.length?S.songs.map(x=>{
+        const who=esc(x.user_name)+(x.partner_name?' + '+esc(x.partner_name):'');
+        const tag=x.duet_status==='pending'?' · ждёт ответа партнёра':x.duet_status==='accepted'?' · дуэт':'';
+        const del=(x.user_id===me.id||isAdmin)?`<button class="g" onclick="del(${x.id})">Убрать</button>`:'';
+        return `<div class="card ${x.status==='singing'?'now':''}"><div>${x.status==='singing'?'Поёт сейчас: ':''}${esc(x.artist)} — ${esc(x.title)}<div class="sub">${who}${tag}</div></div>${del}</div>`;
+      }).join(''):'<div class="sub">Очередь пуста. Добавь первую песню.</div>';
 
-async function claim(n){
-  if(S.claims.some(x=>x.user_id===me.id))return tg.showAlert('Сначала освободи свой микрофон');
-  const {error}=await db.from('mics').insert({mic_no:n,user_id:me.id,name:me.name});
-  if(error)tg.showAlert('Микрофон уже занят');load();
-}
-async function free(n){await db.from('mics').delete().eq('mic_no',n);load();}
+      // выбор партнёра
+      const used=(S.users.find(x=>x.id===me.id||{}).duets_invited>=1);
+      const sel=$('p'), v=sel.value;
+      sel.innerHTML=`<option value="">Без дуэта</option>`+(used?'':S.users.filter(x=>x.id!==me.id).map(x=>`<option value="${x.id}">Дуэт с ${esc(x.name)}</option>`).join(''));
+      sel.value=v;sel.disabled=used;
+      if(used)sel.innerHTML=`<option value="">Дуэт уже использован</option>`;
 
-async function add(){
-  const a=$('a').value.trim(),t=$('t').value.trim(),p=$('p').value;
-  if(!a||!t)return tg.showAlert('Введи исполнителя и название');
-  if(!isAdmin&&S.songs.filter(x=>x.user_id===me.id&&x.status==='queue').length>=2)
-    return tg.showAlert('В очереди может быть не больше 2 твоих песен');
-  const pu=S.users.find(x=>x.id==p);
-  await db.from('songs').insert({title:t,artist:a,user_id:me.id,user_name:me.name,
-    partner_id:pu?pu.id:null,partner_name:pu?pu.name:null,duet_status:pu?'pending':null});
-  if(pu)await db.from('users').update({duets_invited:1}).eq('id',me.id);
-  $('a').value='';$('t').value='';$('p').value='';load();
-}
-async function del(id){await db.from('songs').delete().eq('id',id);load();}
-async function ans(id,yes){
-  await db.from('songs').update(yes?{duet_status:'accepted'}:{duet_status:'declined',partner_id:null,partner_name:null}).eq('id',id);load();
-}
+      // админ-панель
+      $('adm').innerHTML=isAdmin?`<h2>Управление</h2>
+        <div class="card"><div>Микрофонов: ${S.mics}</div><div class="row"><button onclick="setMics(${S.mics-1})">−</button><button onclick="setMics(${S.mics+1})">+</button></div></div>
+        <button class="big" onclick="next()">Следующая песня</button>`:'';
+    }
 
-// админ
-async function setMics(n){
-  if(n<1||n>20)return;
-  await db.from('settings').update({mic_count:n}).eq('id',1);
-  await db.from('mics').delete().gt('mic_no',n);load();
-}
-async function next(){
-  await db.from('songs').update({status:'done'}).eq('status','singing');
-  const f=S.songs.find(x=>x.status==='queue'&&x.duet_status!=='pending');
-  if(f)await db.from('songs').update({status:'singing'}).eq('id',f.id);
-  load();
-}
+    async function claim(n){
+      if(S.claims.some(x=>x.user_id===me.id))return tg.showAlert('Сначала освободи свой микрофон');
+      const {error}=await db.from('mics').insert({mic_no:n,user_id:me.id,name:me.name});
+      if(error)tg.showAlert('Микрофон уже занят');
+      load();
+    }
+    async function free(n){await db.from('mics').delete().eq('mic_no',n);load();}
 
-(async()=>{
-  await db.from('users').upsert({id:me.id,name:me.name});
-  db.channel('k').on('postgres_changes',{event:'*',schema:'public'},load).subscribe();
-  load();
-})();
-</script>
-</body></html>
+    async function add(){
+      const a=$('a').value.trim(),t=$('t').value.trim(),p=$('p').value;
+      if(!a||!t)return tg.showAlert('Введи исполнителя и название');
+      if(!isAdmin&&S.songs.filter(x=>x.user_id===me.id&&x.status==='queue').length>=2)
+        return tg.showAlert('В очереди может быть не больше 2 твоих песен');
+      const pu=S.users.find(x=>x.id==p);
+      await db.from('songs').insert({title:t,artist:a,user_id:me.id,user_name:me.name,
+        partner_id:pu?pu.id:null,partner_name:pu?pu.name:null,duet_status:pu?'pending':null});
+      if(pu)await db.from('users').update({duets_invited:1}).eq('id',me.id);
+      $('a').value='';$('t').value='';$('p').value='';load();
+    }
+    async function del(id){await db.from('songs').delete().eq('id',id);load();}
+    async function ans(id,yes){
+      await db.from('songs').update(yes?{duet_status:'accepted'}:{duet_status:'declined',partner_id:null,partner_name:null}).eq('id',id);load();
+    }
+
+    // ===== ФУНКЦИИ АДМИНИСТРАТОРА =====
+    async function setMics(n){
+      if(n<1||n>20)return;
+      await db.from('settings').update({mic_count:n}).eq('id',1);
+      load();
+    }
+
+    async function next(){
+      // Переключаем текущую песню на завершенную, а следующую в очереди — на статус 'singing'
+      const currentSinging = S.songs.find(x => x.status === 'singing');
+      if(currentSinging) {
+        await db.from('songs').update({status: 'done'}).eq('id', currentSinging.id);
+      }
+      const nextInQueue = S.songs.find(x => x.status === 'queue');
+      if(nextInQueue) {
+        await db.from('songs').update({status: 'singing'}).eq('id', nextInQueue.id);
+      }
+      load();
+    }
+
+    // ===== ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ =====
+    load();
+    </script>
+</body>
+</html>
