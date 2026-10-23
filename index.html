@@ -41,7 +41,6 @@
 <body>
     <header>
         <div class="sign">КАРАОКЕ</div>
-        <div class="sub">очередь и микрофоны</div>
     </header>
     
     <div id="top"></div>
@@ -78,20 +77,38 @@
     const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     let S = {mics:2, songs:[], claims:[], users:[]};
 
-    async function load(){
-      try {
-        const [s, so, m, u] = await Promise.all([
-          db.from('settings').select().eq('id',1).single(),
-          db.from('songs').select().in('status',['queue','singing']).order('id'),
-          db.from('mics').select(), 
-          db.from('users').select().order('name')
-        ]);
-        S = {mics:s.data?.mic_count||2, songs:so.data||[], claims:m.data||[], users:u.data||[]};
-        render();
-      } catch(e) {
-        console.error("Ошибка загрузки данных из Supabase:", e);
-      }
+    // ИСПРАВЛЕНО: Теперь при каждом входе пользователь автоматически записывается в БД
+async function load(){
+  try {
+    // 1. Сначала автоматически регистрируем/обновляем текущего пользователя в таблице users
+    if (me && me.id) {
+      await db.from('users').upsert({
+        id: me.id,
+        name: me.name
+      }, { onConflict: 'id' });
     }
+
+    // 2. Затем скачиваем все актуальные данные для интерфейса
+    const resSettings = await db.from('settings').select('mic_count').eq('id',1).maybeSingle();
+    const resSongs = await db.from('songs').select().in('status',['queue','singing']).order('id');
+    const resMics = await db.from('mics').select();
+    const resUsers = await db.from('users').select().order('name');
+
+    // 3. Записываем в состояние приложения
+    S = {
+      mics: resSettings.data?.mic_count || 2,
+      songs: resSongs.data || [],
+      claims: resMics.data || [],
+      users: resUsers.data || []
+    };
+    
+    // 4. Отрисовываем интерфейс
+    render();
+  } catch(e) {
+    console.error("Критическая ошибка работы с данными караоке:", e);
+  }
+}
+
 
     function render(){
       // приглашения на дуэт
