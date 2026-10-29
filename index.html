@@ -38,6 +38,10 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .act{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .act .btn:first-child{flex:1}
 .empty{text-align:center;color:var(--dim);padding:48px 0}
+.spinner{width:34px;height:34px;border:3px solid #39234e;border-top-color:var(--pink);border-right-color:var(--cyan);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.spinner{animation:none}}
+.btn.subtle{border-color:#493858;color:#aa9bbd;box-shadow:none;background:#10091a;font-weight:500}.btn.subtle:active{transform:none}
 .over{position:fixed;inset:0;background:#000a;display:flex;align-items:flex-end;z-index:5}
 .sheet{background:#120a1e;border-top:1.5px solid var(--pink);box-shadow:0 -6px 30px #ff3fa430;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));width:100%;max-height:85vh;overflow:auto}
 .sheet h2{font-size:18px;margin-bottom:12px}
@@ -58,7 +62,7 @@ input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 8px #3de8ff55}
   <button class="btn pink" data-act="add">+ Песня</button>
 </header>
 <div class="bar"><span id="info"></span><button class="gear" data-act="admin" id="gear" hidden>⚙️</button></div>
-<main id="list"></main>
+<main id="list"><div class="empty"><div class="spinner" role="status" aria-label="Загрузка"></div>Загружаем песни…</div></main>
 <div id="modal"></div>
 <div id="toast"></div>
 
@@ -67,7 +71,7 @@ input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 8px #3de8ff55}
 const SUPABASE_URL = 'https://gfsjpghpyfjsegshoesd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdmc2pwZ2hweWZqc2Vnc2hvZXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNzkyMDgsImV4cCI6MjEwODg1NTIwOH0.hPIT_Yj-AK_e7KS-x-xKTglq4pnsKu246of1-5K18QQ';
 const ADMIN_ID = 772891654; // твой Telegram ID (число)
-const MAX_SONGS = 2;
+const DEFAULT_LIMITS = { max_songs: 2, max_mic_reservations: 4 };
 // ==========================================
 
 const tg = window.Telegram && Telegram.WebApp;
@@ -76,7 +80,8 @@ const tu = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || { id: 1, first
 const ME = tu.id, MYNAME = [tu.first_name, tu.last_name].filter(Boolean).join(' ');
 const isAdmin = ME === ADMIN_ID;
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let S = { songs: [], mics: [], users: [], n: 2 };
+let S = { songs: [], mics: [], users: [], n: 2, maxSongs: 2, maxReservations: 4 };
+let loading = false, loadAgain = false, realtimeTimer = null;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const me = () => S.users.find(u => u.id === ME) || {};
@@ -85,6 +90,8 @@ function toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('o
 async function run(p) { const r = await p; if (r && r.error) { toast('Ошибка: ' + r.error.message); throw r.error; } return r; }
 
 async function load() {
+  if (loading) { loadAgain = true; return; }
+  loading = true;
   try {
     const [a, b, c, d] = await Promise.all([
       db.from('songs').select().order('id'),
@@ -93,9 +100,11 @@ async function load() {
       db.from('settings').select().eq('id', 1).single()
     ]);
     if (a.error) throw a.error;
-    S = { songs: a.data, mics: b.data || [], users: c.data || [], n: d.data ? d.data.mics : 2 };
+    const cfg = d.data || {};
+    S = { songs: a.data || [], mics: b.data || [], users: c.data || [], n: Number(cfg.mics) || 2, maxSongs: Number(cfg.max_songs) || DEFAULT_LIMITS.max_songs, maxReservations: Number(cfg.max_mic_reservations) || DEFAULT_LIMITS.max_mic_reservations };
     render();
   } catch (e) { $('#list').innerHTML = '<div class="empty">Не удалось загрузить данные</div>'; }
+  finally { loading = false; if (loadAgain) { loadAgain = false; setTimeout(load, 180); } }
 }
 
 function render() {
@@ -108,12 +117,13 @@ function render() {
     const mine = s.user_id === ME, has = mics.some(x => x.user_id === ME);
     let act;
     if (mine) {
-      act = '<button class="btn" data-act="duet" data-id="' + s.id + '"' + (m.solo_used && !s.locked ? ' disabled' : '') + '>' +
+      act = '<button class="btn subtle sm" data-act="duet" data-id="' + s.id + '"' + (m.solo_used && !s.locked ? ' disabled' : '') + '>' +
         (s.locked ? 'Распорядиться микрофонами' : m.solo_used ? 'Дуэт/соло уже использован' : 'Дуэт или соло') + '</button>' +
         '<button class="btn sm" data-act="del" data-id="' + s.id + '">Убрать</button>';
     } else if (s.locked) act = '<button class="btn" disabled>Закрытый номер</button>';
     else if (has) act = '<button class="btn pink" data-act="release" data-id="' + s.id + '">Отдать микрофон</button>';
     else if (mics.length >= S.n) act = '<button class="btn" disabled>Все микрофоны заняты</button>';
+    else if (S.mics.filter(x => x.user_id === ME).length >= S.maxReservations) act = '<button class="btn" disabled>Лимит микрофонов (' + S.maxReservations + ')</button>';
     else act = '<button class="btn" data-act="take" data-id="' + s.id + '">Занять микрофон</button>';
     return '<div class="card' + (i === 0 ? ' now' : '') + '">' + (i === 0 ? '<div class="badge">● СЕЙЧАС НА СЦЕНЕ</div>' : '') +
       '<div class="row"><div><div class="title">' + esc(s.title) + '</div><div class="artist">' + esc(s.artist) + '</div></div>' +
@@ -134,19 +144,20 @@ document.addEventListener('click', async e => {
   try {
     if (act === 'close') close();
     else if (act === 'add') {
-      if (S.songs.filter(x => x.user_id === ME).length >= MAX_SONGS) return toast('В очереди уже ' + MAX_SONGS + ' твои песни');
+      if (S.songs.filter(x => x.user_id === ME).length >= S.maxSongs) return toast('В очереди уже ' + S.maxSongs + ' твоих песен');
       sheet('<h2>Предложить песню</h2><input id="t" placeholder="Название" maxlength="80"><input id="a" placeholder="Исполнитель" maxlength="80"><div class="hint">Микрофон для тебя забронируется автоматически</div><button class="btn pink" style="width:100%" data-act="save">Добавить в очередь</button>');
     }
     else if (act === 'save') {
       const t = $('#t').value.trim(), a = $('#a').value.trim();
       if (!t) return toast('Впиши название');
-      if (S.songs.filter(x => x.user_id === ME).length >= MAX_SONGS) return toast('Лимит: ' + MAX_SONGS + ' песни');
+      if (S.songs.filter(x => x.user_id === ME).length >= S.maxSongs) return toast('Лимит: ' + S.maxSongs + ' твоих песен');
       const r = await run(db.from('songs').insert({ title: t, artist: a, user_id: ME, user_name: MYNAME }).select().single());
       await run(db.from('song_mics').insert({ song_id: r.data.id, user_id: ME, user_name: MYNAME }));
       close(); await load();
     }
     else if (act === 'take') {
       if (S.mics.filter(x => x.song_id === id).length >= S.n) return toast('Микрофоны уже заняты');
+      if (S.mics.filter(x => x.user_id === ME).length >= S.maxReservations) return toast('Можно занять микрофон максимум на ' + S.maxReservations + ' песнях до их исполнения');
       await run(db.from('song_mics').insert({ song_id: id, user_id: ME, user_name: MYNAME })); await load();
     }
     else if (act === 'release') { await run(db.from('song_mics').delete().eq('song_id', id).eq('user_id', ME)); await load(); }
@@ -173,12 +184,19 @@ document.addEventListener('click', async e => {
       close(); await load();
     }
     else if (act === 'admin') {
-      sheet('<h2>Настройки</h2><div class="hint">Количество микрофонов</div><div class="stepper"><button class="btn sm" data-act="mics" data-d="-1">−</button><b>' + S.n + '</b><button class="btn sm" data-act="mics" data-d="1">+</button></div>' +
-        '<button class="btn pink" style="width:100%" data-act="newnight">Новый вечер (сбросить дуэты/соло)</button>');
+      sheet('<h2>Настройки ограничений</h2><div class="hint">Изменения применяются ко всей очереди</div>' +
+        '<label class="hint" for="cfg-mics">Количество микрофонов</label><input id="cfg-mics" type="number" min="1" max="20" value="' + S.n + '">' +
+        '<label class="hint" for="cfg-songs">Максимум песен от одного человека</label><input id="cfg-songs" type="number" min="1" max="20" value="' + S.maxSongs + '">' +
+        '<label class="hint" for="cfg-res">Максимум занятых микрофонов на разных песнях</label><input id="cfg-res" type="number" min="1" max="20" value="' + S.maxReservations + '">' +
+        '<button class="btn pink" style="width:100%;margin-bottom:10px" data-act="savecfg">Сохранить ограничения</button>' +
+        '<button class="btn" style="width:100%" data-act="newnight">Новый вечер (сбросить дуэты/соло)</button>');
     }
-    else if (act === 'mics') {
-      const n = Math.max(1, Math.min(20, S.n + Number(b.dataset.d)));
-      await run(db.from('settings').update({ mics: n }).eq('id', 1)); await load(); $('[data-act=admin]').click();
+    else if (act === 'savecfg') {
+      const n = Math.max(1, Math.min(20, Number($('#cfg-mics').value) || 2));
+      const maxSongs = Math.max(1, Math.min(20, Number($('#cfg-songs').value) || 2));
+      const maxReservations = Math.max(1, Math.min(20, Number($('#cfg-res').value) || 4));
+      await run(db.from('settings').update({ mics: n, max_songs: maxSongs, max_mic_reservations: maxReservations }).eq('id', 1));
+      close(); await load(); toast('Ограничения сохранены');
     }
     else if (act === 'newnight') { await run(db.from('users').update({ solo_used: false }).neq('id', 0)); close(); await load(); toast('Готово'); }
   } catch (err) { }
@@ -187,8 +205,8 @@ document.addEventListener('click', async e => {
 (async () => {
   try { await db.from('users').upsert({ id: ME, name: MYNAME }, { onConflict: 'id' }); } catch (e) {}
   await load();
-  db.channel('k').on('postgres_changes', { event: '*', schema: 'public' }, load).subscribe();
-  setInterval(load, 15000);
+  db.channel('k').on('postgres_changes', { event: '*', schema: 'public' }, () => { clearTimeout(realtimeTimer); realtimeTimer = setTimeout(load, 350); }).subscribe();
+  setInterval(load, 45000);
 })();
 </script>
 </body>
