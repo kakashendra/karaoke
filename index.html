@@ -10,48 +10,47 @@
 <style>
 :root{--bg:#0a0612;--card:#150d22;--line:#2b1d44;--pink:#ff3fa4;--cyan:#3de8ff;--text:#f3ecff;--dim:#8f82ab}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-body{background:radial-gradient(120% 60% at 50% -10%,#2a0f3d 0%,var(--bg) 60%) fixed;color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;padding:0 14px calc(24px + env(safe-area-inset-bottom,0px))}
+html{background:var(--bg)}
+body{background:radial-gradient(120% 50% at 50% -8%,#2a0f3d 0%,var(--bg) 70%) no-repeat;color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;padding:0 14px calc(24px + env(safe-area-inset-bottom,0px))}
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 0 6px}
-.sign{font-family:"Tilt Neon",cursive,sans-serif;font-size:30px;letter-spacing:2px;color:#ffe3f3;text-shadow:0 0 4px #fff,0 0 12px var(--pink),0 0 28px var(--pink),0 0 48px var(--pink);animation:fl 6s infinite}
-.sign i{font-style:normal;animation:fl2 4s infinite}
-@keyframes fl{0%,92%,100%{opacity:1}93%{opacity:.6}94%{opacity:1}96%{opacity:.7}}
-@keyframes fl2{0%,80%,100%{opacity:1}82%{opacity:.25}84%{opacity:1}86%{opacity:.4}88%{opacity:1}}
-@media (prefers-reduced-motion:reduce){.sign,.sign i{animation:none}}
-button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
-.btn{border:1.5px solid var(--cyan);color:var(--cyan);border-radius:12px;padding:9px 14px;font-weight:600;box-shadow:0 0 10px #3de8ff55,inset 0 0 10px #3de8ff22;transition:transform .1s}
-.btn:active{transform:scale(.96)}
-.btn.pink{border-color:var(--pink);color:var(--pink);box-shadow:0 0 10px #ff3fa455,inset 0 0 10px #ff3fa422}
+.sign{font-family:"Tilt Neon",cursive,sans-serif;font-size:30px;letter-spacing:2px;color:#ffe3f3;text-shadow:0 0 4px #fff,0 0 12px var(--pink),0 0 26px var(--pink);will-change:opacity;animation:fl 6s infinite}
+.sign i{font-style:normal}
+@keyframes fl{0%,92%,100%{opacity:1}93%{opacity:.65}94%{opacity:1}96%{opacity:.75}}
+@media (prefers-reduced-motion:reduce){.sign{animation:none}}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
+.btn{border:1.5px solid var(--cyan);color:var(--cyan);border-radius:12px;padding:10px 14px;font-weight:600;box-shadow:0 0 8px #3de8ff44}
+.btn:active{opacity:.7}
+.btn.pink{border-color:var(--pink);color:var(--pink);box-shadow:0 0 8px #ff3fa444}
 .btn[disabled]{border-color:var(--line);color:var(--dim);box-shadow:none;cursor:default}
-.btn.sm{padding:6px 10px;font-size:13px}
+.btn.sm{padding:5px 10px;font-size:13px}
 .bar{display:flex;justify-content:space-between;align-items:center;color:var(--dim);font-size:13px;padding:4px 0 12px}
 .gear{font-size:18px;padding:4px 8px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
-.card.now{border-color:var(--pink);box-shadow:0 0 16px #ff3fa440}
-.badge{display:inline-block;font-size:11px;letter-spacing:1px;color:var(--pink);text-shadow:0 0 8px var(--pink);margin-bottom:4px}
+.card.now{border-color:var(--pink);box-shadow:0 0 12px #ff3fa433}
+.badge{font-size:11px;letter-spacing:1px;color:var(--pink);margin-bottom:2px}
 .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.side{display:flex;gap:4px;align-items:center}
 .title{font-weight:700;font-size:17px}
 .artist{color:var(--dim)}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
-.chip{background:#231538;border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-size:13px}
+.dots{color:var(--dim);font-size:20px;line-height:1;padding:2px 8px;opacity:.55}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{background:#231538;border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:13px}
 .chip.own{border-color:var(--cyan);color:var(--cyan)}
-.lock{color:var(--pink);font-size:13px;margin-top:8px}
-.act{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.act .btn:first-child{flex:1}
+.act{margin-top:12px}
+.act .btn{width:100%}
 .empty{text-align:center;color:var(--dim);padding:48px 0}
-.spinner{width:34px;height:34px;border:3px solid #39234e;border-top-color:var(--pink);border-right-color:var(--cyan);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.spinner{animation:none}}
-.btn.subtle{border-color:#493858;color:#aa9bbd;box-shadow:none;background:#10091a;font-weight:500}.btn.subtle:active{transform:none}
 .over{position:fixed;inset:0;background:#000a;display:flex;align-items:flex-end;z-index:5}
-.sheet{background:#120a1e;border-top:1.5px solid var(--pink);box-shadow:0 -6px 30px #ff3fa430;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));width:100%;max-height:85vh;overflow:auto}
+.sheet{background:#120a1e;border-top:1.5px solid var(--pink);border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));width:100%;max-height:85vh;overflow:auto}
 .sheet h2{font-size:18px;margin-bottom:12px}
-input{width:100%;background:#0a0612;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text);font:inherit;margin-bottom:10px}
-input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 8px #3de8ff55}
+input[type=text]{width:100%;background:#0a0612;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text);font:inherit;margin-bottom:10px}
+input[type=text]:focus{outline:none;border-color:var(--cyan)}
 .pick{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line)}
-.pick input{width:auto;margin:0}
+.opt{display:block;width:100%;text-align:left;padding:14px 4px;border-bottom:1px solid var(--line)}
+.opt.dim{color:var(--dim)}
 .hint{color:var(--dim);font-size:13px;margin-bottom:10px}
-.stepper{display:flex;align-items:center;gap:16px;margin:8px 0 18px}
-.stepper b{font-size:24px;min-width:30px;text-align:center}
+.set{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.stepper{display:flex;align-items:center;gap:14px}
+.stepper b{font-size:20px;min-width:24px;text-align:center}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#26103a;border:1px solid var(--pink);padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90%;text-align:center}
 #toast.on{opacity:1}
 </style>
@@ -62,36 +61,53 @@ input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 8px #3de8ff55}
   <button class="btn pink" data-act="add">+ Песня</button>
 </header>
 <div class="bar"><span id="info"></span><button class="gear" data-act="admin" id="gear" hidden>⚙️</button></div>
-<main id="list"><div class="empty"><div class="spinner" role="status" aria-label="Загрузка"></div>Загружаем песни…</div></main>
+<main id="list"></main>
 <div id="modal"></div>
 <div id="toast"></div>
 
 <script>
-// ===== НАСТРОЙКИ: впиши свои значения =====
+// ===== НАСТРОЙКИ: вставь свой ключ =====
 const SUPABASE_URL = 'https://gfsjpghpyfjsegshoesd.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdmc2pwZ2hweWZqc2Vnc2hvZXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNzkyMDgsImV4cCI6MjEwODg1NTIwOH0.hPIT_Yj-AK_e7KS-x-xKTglq4pnsKu246of1-5K18QQ';
-const ADMIN_ID = 772891654; // твой Telegram ID (число)
-const DEFAULT_LIMITS = { max_songs: 2, max_mic_reservations: 4 };
-// ==========================================
+const SUPABASE_KEY = 'ВСТАВЬ-СВОЙ-КЛЮЧ';
+const ADMIN_ID = 772891654;
+// =======================================
 
 const tg = window.Telegram && Telegram.WebApp;
-if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor('#0a0612'); tg.setBackgroundColor('#0a0612'); } catch (e) {} }
+if (tg) {
+  tg.ready(); tg.expand();
+  try { tg.setHeaderColor('#0a0612'); tg.setBackgroundColor('#0a0612'); } catch (e) {}
+  try { tg.disableVerticalSwipes(); } catch (e) {} // чтобы приложение не сворачивалось при прокрутке вверх
+}
 const tu = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || { id: 1, first_name: 'Гость' };
 const ME = tu.id, MYNAME = [tu.first_name, tu.last_name].filter(Boolean).join(' ');
 const isAdmin = ME === ADMIN_ID;
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let S = { songs: [], mics: [], users: [], n: 2, maxSongs: 2, maxReservations: 4 };
-let loading = false, loadAgain = false, realtimeTimer = null;
+
+const CFG0 = { mics: 2, max_songs: 2, max_mic_songs: 4, duet_limit: 1 };
+const LIMITS = { mics: [1, 20], max_songs: [1, 10], max_mic_songs: [1, 20], duet_limit: [0, 5] };
+const LABELS = { mics: 'Микрофонов', max_songs: 'Песен в очереди на человека', max_mic_songs: 'Песен с микрофоном на человека', duet_limit: 'Дуэтов/соло за вечер' };
+let S = { songs: [], mics: [], users: [], cfg: { ...CFG0 } }, last = '', pending = 0, timer;
+
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const me = () => S.users.find(u => u.id === ME) || {};
+const nameOf = id => (S.users.find(u => u.id === id) || {}).name || '?';
+const hap = () => { try { tg.HapticFeedback.impactOccurred('light'); } catch (e) {} };
 
 function toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 2400); }
 async function run(p) { const r = await p; if (r && r.error) { toast('Ошибка: ' + r.error.message); throw r.error; } return r; }
 
+// Мгновенно обновляем экран, а запрос к базе уходит в фоне
+async function mut(local, remote) {
+  pending++; hap();
+  try { local && local(); render(); await remote(); }
+  catch (e) { /* ошибка уже показана, экран вернётся к данным сервера */ }
+  finally { pending--; sync(); }
+}
+function sync() { clearTimeout(timer); timer = setTimeout(load, 350); }
+
 async function load() {
-  if (loading) { loadAgain = true; return; }
-  loading = true;
+  if (pending) return;
   try {
     const [a, b, c, d] = await Promise.all([
       db.from('songs').select().order('id'),
@@ -100,113 +116,161 @@ async function load() {
       db.from('settings').select().eq('id', 1).single()
     ]);
     if (a.error) throw a.error;
-    const cfg = d.data || {};
-    S = { songs: a.data || [], mics: b.data || [], users: c.data || [], n: Number(cfg.mics) || 2, maxSongs: Number(cfg.max_songs) || DEFAULT_LIMITS.max_songs, maxReservations: Number(cfg.max_mic_reservations) || DEFAULT_LIMITS.max_mic_reservations };
-    render();
-  } catch (e) { $('#list').innerHTML = '<div class="empty">Не удалось загрузить данные</div>'; }
-  finally { loading = false; if (loadAgain) { loadAgain = false; setTimeout(load, 180); } }
+    if (pending) return;
+    const next = { songs: a.data, mics: b.data || [], users: c.data || [], cfg: { ...CFG0, ...(d.data || {}) } };
+    if (JSON.stringify(next) !== last) { S = next; render(); }
+  } catch (e) { if (!S.songs.length) $('#list').innerHTML = '<div class="empty">Не удалось загрузить данные</div>'; }
 }
 
+const dis = t => '<div class="act"><button class="btn" disabled>' + t + '</button></div>';
+const btn = (c, a, id, t) => '<div class="act"><button class="btn ' + c + '" data-act="' + a + '" data-id="' + id + '">' + t + '</button></div>';
+
 function render() {
+  last = JSON.stringify(S);
   $('#gear').hidden = !isAdmin;
-  $('#info').textContent = 'Микрофонов: ' + S.n;
+  $('#info').textContent = 'Микрофонов: ' + S.cfg.mics;
   if (!S.songs.length) { $('#list').innerHTML = '<div class="empty">Очередь пуста — предложи первую песню 🎤</div>'; return; }
-  const m = me();
+  const myMics = S.mics.filter(x => x.user_id === ME).length;
   $('#list').innerHTML = S.songs.map((s, i) => {
     const mics = S.mics.filter(x => x.song_id === s.id);
     const mine = s.user_id === ME, has = mics.some(x => x.user_id === ME);
-    let act;
-    if (mine) {
-      act = '<button class="btn subtle sm" data-act="duet" data-id="' + s.id + '"' + (m.solo_used && !s.locked ? ' disabled' : '') + '>' +
-        (s.locked ? 'Распорядиться микрофонами' : m.solo_used ? 'Дуэт/соло уже использован' : 'Дуэт или соло') + '</button>' +
-        '<button class="btn sm" data-act="del" data-id="' + s.id + '">Убрать</button>';
-    } else if (s.locked) act = '<button class="btn" disabled>Закрытый номер</button>';
-    else if (has) act = '<button class="btn pink" data-act="release" data-id="' + s.id + '">Отдать микрофон</button>';
-    else if (mics.length >= S.n) act = '<button class="btn" disabled>Все микрофоны заняты</button>';
-    else if (S.mics.filter(x => x.user_id === ME).length >= S.maxReservations) act = '<button class="btn" disabled>Лимит микрофонов (' + S.maxReservations + ')</button>';
-    else act = '<button class="btn" data-act="take" data-id="' + s.id + '">Занять микрофон</button>';
-    return '<div class="card' + (i === 0 ? ' now' : '') + '">' + (i === 0 ? '<div class="badge">● СЕЙЧАС НА СЦЕНЕ</div>' : '') +
-      '<div class="row"><div><div class="title">' + esc(s.title) + '</div><div class="artist">' + esc(s.artist) + '</div></div>' +
-      (isAdmin ? '<button class="btn sm" data-act="done" data-id="' + s.id + '">✓ спето</button>' : '') + '</div>' +
-      '<div class="chips">' + mics.map(x => '<span class="chip' + (x.user_id === s.user_id ? ' own' : '') + '">🎤 ' + esc(x.user_name) + '</span>').join('') + '</div>' +
-      (s.locked ? '<div class="lock">🔒 Закрытый номер от ' + esc(s.user_name) + '</div>' : '') +
-      '<div class="act">' + act + '</div></div>';
+    let act = '';
+    if (!mine) {
+      if (s.locked) act = dis('Закрытый номер');
+      else if (has) act = btn('pink', 'release', s.id, 'Отдать микрофон');
+      else if (mics.length >= S.cfg.mics) act = dis('Все микрофоны заняты');
+      else if (myMics >= S.cfg.max_mic_songs) act = dis('Лимит микрофонов исчерпан');
+      else act = btn('', 'take', s.id, 'Занять микрофон');
+    }
+    return '<div class="card' + (i === 0 ? ' now' : '') + '">' + (i === 0 ? '<div class="badge">● СЕЙЧАС</div>' : '') +
+      '<div class="row"><div><div class="title">' + (s.locked ? '🔒 ' : '') + esc(s.title) + '</div>' + (s.artist ? '<div class="artist">' + esc(s.artist) + '</div>' : '') + '</div>' +
+      '<div class="side">' + (isAdmin ? '<button class="btn sm" data-act="done" data-id="' + s.id + '">✓ спето</button>' : '') +
+      (mine ? '<button class="dots" data-act="menu" data-id="' + s.id + '">⋯</button>' : '') + '</div></div>' +
+      '<div class="chips">' + mics.map(x => '<span class="chip' + (x.user_id === s.user_id ? ' own' : '') + '">🎤 ' + esc(x.user_name) + '</span>').join('') + '</div>' + act + '</div>';
   }).join('');
 }
 
 function sheet(html) { $('#modal').innerHTML = '<div class="over" data-act="close"><div class="sheet">' + html + '</div></div>'; }
 function close() { $('#modal').innerHTML = ''; }
+const duetsLeft = () => S.cfg.duet_limit - (me().duets_used || 0);
 
-document.addEventListener('click', async e => {
+function openAdmin() {
+  sheet('<h2>Настройки</h2>' + Object.keys(LABELS).map(k =>
+    '<div class="set"><span>' + LABELS[k] + '</span><div class="stepper"><button class="btn sm" data-act="cfg" data-k="' + k + '" data-d="-1">−</button><b id="v_' + k + '">' + S.cfg[k] + '</b><button class="btn sm" data-act="cfg" data-k="' + k + '" data-d="1">+</button></div></div>').join('') +
+    '<button class="btn pink" style="width:100%;margin-top:16px" data-act="newnight">Новый вечер (сбросить дуэты/соло)</button>');
+}
+
+document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return;
   if (b.classList.contains('over') && e.target !== b) return;
   const act = b.dataset.act, id = Number(b.dataset.id), s = S.songs.find(x => x.id === id);
-  try {
-    if (act === 'close') close();
-    else if (act === 'add') {
-      if (S.songs.filter(x => x.user_id === ME).length >= S.maxSongs) return toast('В очереди уже ' + S.maxSongs + ' твоих песен');
-      sheet('<h2>Предложить песню</h2><input id="t" placeholder="Название" maxlength="80"><input id="a" placeholder="Исполнитель" maxlength="80"><div class="hint">Микрофон для тебя забронируется автоматически</div><button class="btn pink" style="width:100%" data-act="save">Добавить в очередь</button>');
-    }
-    else if (act === 'save') {
-      const t = $('#t').value.trim(), a = $('#a').value.trim();
-      if (!t) return toast('Впиши название');
-      if (S.songs.filter(x => x.user_id === ME).length >= S.maxSongs) return toast('Лимит: ' + S.maxSongs + ' твоих песен');
+  if (id < 0) return; // песня ещё сохраняется
+
+  if (act === 'close') close();
+
+  else if (act === 'add') {
+    if (S.songs.filter(x => x.user_id === ME).length >= S.cfg.max_songs) return toast('Лимит песен в очереди исчерпан');
+    if (S.mics.filter(x => x.user_id === ME).length >= S.cfg.max_mic_songs) return toast('Лимит микрофонов исчерпан');
+    sheet('<h2>Предложить песню</h2><input type="text" id="t" placeholder="Название" maxlength="80"><input type="text" id="a" placeholder="Исполнитель" maxlength="80"><div class="hint">Микрофон для тебя забронируется автоматически</div><button class="btn pink" style="width:100%" data-act="save">Добавить в очередь</button>');
+  }
+
+  else if (act === 'save') {
+    const t = $('#t').value.trim(), a = $('#a').value.trim();
+    if (!t) return toast('Впиши название');
+    const tmp = -Date.now();
+    close();
+    mut(() => {
+      S.songs.push({ id: tmp, title: t, artist: a, user_id: ME, user_name: MYNAME, locked: false });
+      S.mics.push({ id: tmp, song_id: tmp, user_id: ME, user_name: MYNAME });
+    }, async () => {
       const r = await run(db.from('songs').insert({ title: t, artist: a, user_id: ME, user_name: MYNAME }).select().single());
+      S.songs.forEach(x => { if (x.id === tmp) x.id = r.data.id; });
+      S.mics.forEach(x => { if (x.song_id === tmp) x.song_id = r.data.id; });
+      render();
       await run(db.from('song_mics').insert({ song_id: r.data.id, user_id: ME, user_name: MYNAME }));
-      close(); await load();
-    }
-    else if (act === 'take') {
-      if (S.mics.filter(x => x.song_id === id).length >= S.n) return toast('Микрофоны уже заняты');
-      if (S.mics.filter(x => x.user_id === ME).length >= S.maxReservations) return toast('Можно занять микрофон максимум на ' + S.maxReservations + ' песнях до их исполнения');
-      await run(db.from('song_mics').insert({ song_id: id, user_id: ME, user_name: MYNAME })); await load();
-    }
-    else if (act === 'release') { await run(db.from('song_mics').delete().eq('song_id', id).eq('user_id', ME)); await load(); }
-    else if (act === 'del' || act === 'done') {
-      if (act === 'del' && !confirm('Убрать песню из очереди?')) return;
-      await run(db.from('songs').delete().eq('id', id)); await load();
-    }
-    else if (act === 'duet') {
-      const cur = S.mics.filter(x => x.song_id === id && x.user_id !== ME).map(x => x.user_id);
-      const others = S.users.filter(u => u.id !== ME);
-      sheet('<h2>Дуэт или соло</h2><div class="hint">Один раз за вечер. Пока номер закрыт, никто другой не может брать микрофоны — ты решаешь, кому их дать (максимум ' + (S.n - 1) + ' + ты).</div>' +
-        (others.length ? others.map(u => '<label class="pick"><input type="checkbox" value="' + u.id + '"' + (cur.includes(u.id) ? ' checked' : '') + '>' + esc(u.name) + '</label>').join('') : '<div class="hint">Пока никто больше не заходил в приложение.</div>') +
-        '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn" style="flex:1" data-act="lock" data-id="' + id + '">Сохранить</button><button class="btn pink" style="flex:1" data-act="lock" data-id="' + id + '" data-solo="1">Спою один</button></div>');
-      document.querySelectorAll('.pick input').forEach(c => c.addEventListener('change', () => {
-        if (document.querySelectorAll('.pick input:checked').length > S.n - 1) { c.checked = false; toast('Микрофонов всего ' + S.n); }
-      }));
-    }
-    else if (act === 'lock') {
-      const ids = b.dataset.solo ? [] : [...document.querySelectorAll('.pick input:checked')].map(c => Number(c.value));
+    });
+  }
+
+  else if (act === 'take') {
+    if (S.mics.filter(x => x.song_id === id).length >= S.cfg.mics) return toast('Микрофоны уже заняты');
+    mut(() => S.mics.push({ id: -Date.now(), song_id: id, user_id: ME, user_name: MYNAME }),
+      () => run(db.from('song_mics').insert({ song_id: id, user_id: ME, user_name: MYNAME })));
+  }
+
+  else if (act === 'release') {
+    mut(() => { S.mics = S.mics.filter(x => !(x.song_id === id && x.user_id === ME)); },
+      () => run(db.from('song_mics').delete().eq('song_id', id).eq('user_id', ME)));
+  }
+
+  else if (act === 'done') {
+    mut(() => { S.songs = S.songs.filter(x => x.id !== id); S.mics = S.mics.filter(x => x.song_id !== id); },
+      () => run(db.from('songs').delete().eq('id', id)));
+  }
+
+  else if (act === 'menu') {
+    sheet('<h2>' + esc(s.title) + '</h2>' +
+      '<button class="opt dim" data-act="duet" data-id="' + id + '">' + (s.locked ? 'Распорядиться микрофонами' : 'Дуэт или соло') + '</button>' +
+      '<button class="opt dim" data-act="del" data-id="' + id + '">Убрать песню из очереди</button>');
+  }
+
+  else if (act === 'del') {
+    close();
+    mut(() => { S.songs = S.songs.filter(x => x.id !== id); S.mics = S.mics.filter(x => x.song_id !== id); },
+      () => run(db.from('songs').delete().eq('id', id)));
+  }
+
+  else if (act === 'duet') {
+    if (!s.locked && duetsLeft() <= 0) return toast('Попытка дуэта/соло уже использована');
+    const cur = S.mics.filter(x => x.song_id === id && x.user_id !== ME).map(x => x.user_id);
+    const others = S.users.filter(u => u.id !== ME);
+    sheet('<h2>Дуэт или соло</h2><div class="hint">Пока номер закрыт, никто другой не может брать микрофоны — ты решаешь, кому их дать (до ' + (S.cfg.mics - 1) + ' человек кроме тебя).</div>' +
+      (others.length ? others.map(u => '<label class="pick"><input type="checkbox" value="' + u.id + '"' + (cur.includes(u.id) ? ' checked' : '') + '>' + esc(u.name) + '</label>').join('') : '<div class="hint">Пока никто больше не заходил в приложение.</div>') +
+      '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn" style="flex:1" data-act="lock" data-id="' + id + '">Сохранить</button><button class="btn pink" style="flex:1" data-act="lock" data-id="' + id + '" data-solo="1">Спою один</button></div>');
+    document.querySelectorAll('.pick input').forEach(c => c.addEventListener('change', () => {
+      if (document.querySelectorAll('.pick input:checked').length > S.cfg.mics - 1) { c.checked = false; toast('Микрофонов всего ' + S.cfg.mics); }
+    }));
+  }
+
+  else if (act === 'lock') {
+    const ids = b.dataset.solo ? [] : [...document.querySelectorAll('.pick input:checked')].map(c => Number(c.value));
+    const first = !s.locked;
+    close();
+    mut(() => {
+      S.mics = S.mics.filter(x => !(x.song_id === id && x.user_id !== ME));
+      ids.forEach(u => S.mics.push({ id: -Math.random(), song_id: id, user_id: u, user_name: nameOf(u) }));
+      s.locked = true;
+      if (first) { const m = S.users.find(u => u.id === ME); if (m) m.duets_used = (m.duets_used || 0) + 1; }
+    }, async () => {
       await run(db.from('song_mics').delete().eq('song_id', id).neq('user_id', ME));
-      if (ids.length) await run(db.from('song_mics').insert(ids.map(u => ({ song_id: id, user_id: u, user_name: (S.users.find(x => x.id === u) || {}).name || '?' }))));
+      if (ids.length) await run(db.from('song_mics').insert(ids.map(u => ({ song_id: id, user_id: u, user_name: nameOf(u) }))));
       await run(db.from('songs').update({ locked: true }).eq('id', id));
-      await run(db.from('users').update({ solo_used: true }).eq('id', ME));
-      close(); await load();
-    }
-    else if (act === 'admin') {
-      sheet('<h2>Настройки ограничений</h2><div class="hint">Изменения применяются ко всей очереди</div>' +
-        '<label class="hint" for="cfg-mics">Количество микрофонов</label><input id="cfg-mics" type="number" min="1" max="20" value="' + S.n + '">' +
-        '<label class="hint" for="cfg-songs">Максимум песен от одного человека</label><input id="cfg-songs" type="number" min="1" max="20" value="' + S.maxSongs + '">' +
-        '<label class="hint" for="cfg-res">Максимум занятых микрофонов на разных песнях</label><input id="cfg-res" type="number" min="1" max="20" value="' + S.maxReservations + '">' +
-        '<button class="btn pink" style="width:100%;margin-bottom:10px" data-act="savecfg">Сохранить ограничения</button>' +
-        '<button class="btn" style="width:100%" data-act="newnight">Новый вечер (сбросить дуэты/соло)</button>');
-    }
-    else if (act === 'savecfg') {
-      const n = Math.max(1, Math.min(20, Number($('#cfg-mics').value) || 2));
-      const maxSongs = Math.max(1, Math.min(20, Number($('#cfg-songs').value) || 2));
-      const maxReservations = Math.max(1, Math.min(20, Number($('#cfg-res').value) || 4));
-      await run(db.from('settings').update({ mics: n, max_songs: maxSongs, max_mic_reservations: maxReservations }).eq('id', 1));
-      close(); await load(); toast('Ограничения сохранены');
-    }
-    else if (act === 'newnight') { await run(db.from('users').update({ solo_used: false }).neq('id', 0)); close(); await load(); toast('Готово'); }
-  } catch (err) { }
+      if (first) await run(db.from('users').update({ duets_used: (me().duets_used || 1) }).eq('id', ME));
+    });
+  }
+
+  else if (act === 'admin') openAdmin();
+
+  else if (act === 'cfg') {
+    const k = b.dataset.k, [lo, hi] = LIMITS[k];
+    const v = Math.max(lo, Math.min(hi, S.cfg[k] + Number(b.dataset.d)));
+    if (v === S.cfg[k]) return;
+    const el = $('#v_' + k); if (el) el.textContent = v;
+    mut(() => { S.cfg[k] = v; }, () => run(db.from('settings').update({ [k]: v }).eq('id', 1)));
+  }
+
+  else if (act === 'newnight') {
+    close();
+    mut(() => S.users.forEach(u => { u.duets_used = 0; }), () => run(db.from('users').update({ duets_used: 0 }).neq('id', 0)));
+    toast('Дуэты/соло сброшены');
+  }
 });
 
 (async () => {
   try { await db.from('users').upsert({ id: ME, name: MYNAME }, { onConflict: 'id' }); } catch (e) {}
   await load();
-  db.channel('k').on('postgres_changes', { event: '*', schema: 'public' }, () => { clearTimeout(realtimeTimer); realtimeTimer = setTimeout(load, 350); }).subscribe();
-  setInterval(load, 45000);
+  db.channel('k').on('postgres_changes', { event: '*', schema: 'public' }, sync).subscribe();
+  setInterval(load, 20000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
 })();
 </script>
 </body>
