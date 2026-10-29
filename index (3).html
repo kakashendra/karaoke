@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Караоке</title>
+<link href="https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#0a0612;--card:#150d22;--line:#2b1d44;--pink:#ff3fa4;--cyan:#3de8ff;--text:#f3ecff;--dim:#8f82ab}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+body{background:radial-gradient(120% 60% at 50% -10%,#2a0f3d 0%,var(--bg) 60%) fixed;color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;padding:0 14px calc(24px + env(safe-area-inset-bottom,0px))}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 0 6px}
+.sign{font-family:"Tilt Neon",cursive,sans-serif;font-size:30px;letter-spacing:2px;color:#ffe3f3;text-shadow:0 0 4px #fff,0 0 12px var(--pink),0 0 28px var(--pink),0 0 48px var(--pink);animation:fl 6s infinite}
+.sign i{font-style:normal;animation:fl2 4s infinite}
+@keyframes fl{0%,92%,100%{opacity:1}93%{opacity:.6}94%{opacity:1}96%{opacity:.7}}
+@keyframes fl2{0%,80%,100%{opacity:1}82%{opacity:.25}84%{opacity:1}86%{opacity:.4}88%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.sign,.sign i{animation:none}}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.btn{border:1.5px solid var(--cyan);color:var(--cyan);border-radius:12px;padding:9px 14px;font-weight:600;box-shadow:0 0 10px #3de8ff55,inset 0 0 10px #3de8ff22;transition:transform .1s}
+.btn:active{transform:scale(.96)}
+.btn.pink{border-color:var(--pink);color:var(--pink);box-shadow:0 0 10px #ff3fa455,inset 0 0 10px #ff3fa422}
+.btn[disabled]{border-color:var(--line);color:var(--dim);box-shadow:none;cursor:default}
+.btn.sm{padding:6px 10px;font-size:13px}
+.bar{display:flex;justify-content:space-between;align-items:center;color:var(--dim);font-size:13px;padding:4px 0 12px}
+.gear{font-size:18px;padding:4px 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.card.now{border-color:var(--pink);box-shadow:0 0 16px #ff3fa440}
+.badge{display:inline-block;font-size:11px;letter-spacing:1px;color:var(--pink);text-shadow:0 0 8px var(--pink);margin-bottom:4px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.title{font-weight:700;font-size:17px}
+.artist{color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.chip{background:#231538;border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-size:13px}
+.chip.own{border-color:var(--cyan);color:var(--cyan)}
+.lock{color:var(--pink);font-size:13px;margin-top:8px}
+.act{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.act .btn:first-child{flex:1}
+.empty{text-align:center;color:var(--dim);padding:48px 0}
+.over{position:fixed;inset:0;background:#000a;display:flex;align-items:flex-end;z-index:5}
+.sheet{background:#120a1e;border-top:1.5px solid var(--pink);box-shadow:0 -6px 30px #ff3fa430;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));width:100%;max-height:85vh;overflow:auto}
+.sheet h2{font-size:18px;margin-bottom:12px}
+input{width:100%;background:#0a0612;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text);font:inherit;margin-bottom:10px}
+input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 8px #3de8ff55}
+.pick{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.pick input{width:auto;margin:0}
+.hint{color:var(--dim);font-size:13px;margin-bottom:10px}
+.stepper{display:flex;align-items:center;gap:16px;margin:8px 0 18px}
+.stepper b{font-size:24px;min-width:30px;text-align:center}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#26103a;border:1px solid var(--pink);padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90%;text-align:center}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <div class="sign">KARA<i>O</i>KE</div>
+  <button class="btn pink" data-act="add">+ Песня</button>
+</header>
+<div class="bar"><span id="info"></span><button class="gear" data-act="admin" id="gear" hidden>⚙️</button></div>
+<main id="list"></main>
+<div id="modal"></div>
+<div id="toast"></div>
+
+<script>
+// ===== НАСТРОЙКИ: впиши свои значения =====
+const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
+const SUPABASE_KEY = 'YOUR-ANON-KEY';
+const ADMIN_ID = 0; // твой Telegram ID (число)
+const MAX_SONGS = 2;
+// ==========================================
+
+const tg = window.Telegram && Telegram.WebApp;
+if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor('#0a0612'); tg.setBackgroundColor('#0a0612'); } catch (e) {} }
+const tu = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || { id: 1, first_name: 'Гость' };
+const ME = tu.id, MYNAME = [tu.first_name, tu.last_name].filter(Boolean).join(' ');
+const isAdmin = ME === ADMIN_ID;
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let S = { songs: [], mics: [], users: [], n: 2 };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const me = () => S.users.find(u => u.id === ME) || {};
+
+function toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 2400); }
+async function run(p) { const r = await p; if (r && r.error) { toast('Ошибка: ' + r.error.message); throw r.error; } return r; }
+
+async function load() {
+  try {
+    const [a, b, c, d] = await Promise.all([
+      db.from('songs').select().order('id'),
+      db.from('song_mics').select(),
+      db.from('users').select().order('name'),
+      db.from('settings').select().eq('id', 1).single()
+    ]);
+    if (a.error) throw a.error;
+    S = { songs: a.data, mics: b.data || [], users: c.data || [], n: d.data ? d.data.mics : 2 };
+    render();
+  } catch (e) { $('#list').innerHTML = '<div class="empty">Не удалось загрузить данные</div>'; }
+}
+
+function render() {
+  $('#gear').hidden = !isAdmin;
+  $('#info').textContent = 'Микрофонов: ' + S.n;
+  if (!S.songs.length) { $('#list').innerHTML = '<div class="empty">Очередь пуста — предложи первую песню 🎤</div>'; return; }
+  const m = me();
+  $('#list').innerHTML = S.songs.map((s, i) => {
+    const mics = S.mics.filter(x => x.song_id === s.id);
+    const mine = s.user_id === ME, has = mics.some(x => x.user_id === ME);
+    let act;
+    if (mine) {
+      act = '<button class="btn" data-act="duet" data-id="' + s.id + '"' + (m.solo_used && !s.locked ? ' disabled' : '') + '>' +
+        (s.locked ? 'Распорядиться микрофонами' : m.solo_used ? 'Дуэт/соло уже использован' : 'Дуэт или соло') + '</button>' +
+        '<button class="btn sm" data-act="del" data-id="' + s.id + '">Убрать</button>';
+    } else if (s.locked) act = '<button class="btn" disabled>Закрытый номер</button>';
+    else if (has) act = '<button class="btn pink" data-act="release" data-id="' + s.id + '">Отдать микрофон</button>';
+    else if (mics.length >= S.n) act = '<button class="btn" disabled>Все микрофоны заняты</button>';
+    else act = '<button class="btn" data-act="take" data-id="' + s.id + '">Занять микрофон</button>';
+    return '<div class="card' + (i === 0 ? ' now' : '') + '">' + (i === 0 ? '<div class="badge">● СЕЙЧАС НА СЦЕНЕ</div>' : '') +
+      '<div class="row"><div><div class="title">' + esc(s.title) + '</div><div class="artist">' + esc(s.artist) + '</div></div>' +
+      (isAdmin ? '<button class="btn sm" data-act="done" data-id="' + s.id + '">✓ спето</button>' : '') + '</div>' +
+      '<div class="chips">' + mics.map(x => '<span class="chip' + (x.user_id === s.user_id ? ' own' : '') + '">🎤 ' + esc(x.user_name) + '</span>').join('') + '</div>' +
+      (s.locked ? '<div class="lock">🔒 Закрытый номер от ' + esc(s.user_name) + '</div>' : '') +
+      '<div class="act">' + act + '</div></div>';
+  }).join('');
+}
+
+function sheet(html) { $('#modal').innerHTML = '<div class="over" data-act="close"><div class="sheet">' + html + '</div></div>'; }
+function close() { $('#modal').innerHTML = ''; }
+
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  if (b.classList.contains('over') && e.target !== b) return;
+  const act = b.dataset.act, id = Number(b.dataset.id), s = S.songs.find(x => x.id === id);
+  try {
+    if (act === 'close') close();
+    else if (act === 'add') {
+      if (S.songs.filter(x => x.user_id === ME).length >= MAX_SONGS) return toast('В очереди уже ' + MAX_SONGS + ' твои песни');
+      sheet('<h2>Предложить песню</h2><input id="t" placeholder="Название" maxlength="80"><input id="a" placeholder="Исполнитель" maxlength="80"><div class="hint">Микрофон для тебя забронируется автоматически</div><button class="btn pink" style="width:100%" data-act="save">Добавить в очередь</button>');
+    }
+    else if (act === 'save') {
+      const t = $('#t').value.trim(), a = $('#a').value.trim();
+      if (!t) return toast('Впиши название');
+      if (S.songs.filter(x => x.user_id === ME).length >= MAX_SONGS) return toast('Лимит: ' + MAX_SONGS + ' песни');
+      const r = await run(db.from('songs').insert({ title: t, artist: a, user_id: ME, user_name: MYNAME }).select().single());
+      await run(db.from('song_mics').insert({ song_id: r.data.id, user_id: ME, user_name: MYNAME }));
+      close(); await load();
+    }
+    else if (act === 'take') {
+      if (S.mics.filter(x => x.song_id === id).length >= S.n) return toast('Микрофоны уже заняты');
+      await run(db.from('song_mics').insert({ song_id: id, user_id: ME, user_name: MYNAME })); await load();
+    }
+    else if (act === 'release') { await run(db.from('song_mics').delete().eq('song_id', id).eq('user_id', ME)); await load(); }
+    else if (act === 'del' || act === 'done') {
+      if (act === 'del' && !confirm('Убрать песню из очереди?')) return;
+      await run(db.from('songs').delete().eq('id', id)); await load();
+    }
+    else if (act === 'duet') {
+      const cur = S.mics.filter(x => x.song_id === id && x.user_id !== ME).map(x => x.user_id);
+      const others = S.users.filter(u => u.id !== ME);
+      sheet('<h2>Дуэт или соло</h2><div class="hint">Один раз за вечер. Пока номер закрыт, никто другой не может брать микрофоны — ты решаешь, кому их дать (максимум ' + (S.n - 1) + ' + ты).</div>' +
+        (others.length ? others.map(u => '<label class="pick"><input type="checkbox" value="' + u.id + '"' + (cur.includes(u.id) ? ' checked' : '') + '>' + esc(u.name) + '</label>').join('') : '<div class="hint">Пока никто больше не заходил в приложение.</div>') +
+        '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn" style="flex:1" data-act="lock" data-id="' + id + '">Сохранить</button><button class="btn pink" style="flex:1" data-act="lock" data-id="' + id + '" data-solo="1">Спою один</button></div>');
+      document.querySelectorAll('.pick input').forEach(c => c.addEventListener('change', () => {
+        if (document.querySelectorAll('.pick input:checked').length > S.n - 1) { c.checked = false; toast('Микрофонов всего ' + S.n); }
+      }));
+    }
+    else if (act === 'lock') {
+      const ids = b.dataset.solo ? [] : [...document.querySelectorAll('.pick input:checked')].map(c => Number(c.value));
+      await run(db.from('song_mics').delete().eq('song_id', id).neq('user_id', ME));
+      if (ids.length) await run(db.from('song_mics').insert(ids.map(u => ({ song_id: id, user_id: u, user_name: (S.users.find(x => x.id === u) || {}).name || '?' }))));
+      await run(db.from('songs').update({ locked: true }).eq('id', id));
+      await run(db.from('users').update({ solo_used: true }).eq('id', ME));
+      close(); await load();
+    }
+    else if (act === 'admin') {
+      sheet('<h2>Настройки</h2><div class="hint">Количество микрофонов</div><div class="stepper"><button class="btn sm" data-act="mics" data-d="-1">−</button><b>' + S.n + '</b><button class="btn sm" data-act="mics" data-d="1">+</button></div>' +
+        '<button class="btn pink" style="width:100%" data-act="newnight">Новый вечер (сбросить дуэты/соло)</button>');
+    }
+    else if (act === 'mics') {
+      const n = Math.max(1, Math.min(20, S.n + Number(b.dataset.d)));
+      await run(db.from('settings').update({ mics: n }).eq('id', 1)); await load(); $('[data-act=admin]').click();
+    }
+    else if (act === 'newnight') { await run(db.from('users').update({ solo_used: false }).neq('id', 0)); close(); await load(); toast('Готово'); }
+  } catch (err) { }
+});
+
+(async () => {
+  try { await db.from('users').upsert({ id: ME, name: MYNAME }, { onConflict: 'id' }); } catch (e) {}
+  await load();
+  db.channel('k').on('postgres_changes', { event: '*', schema: 'public' }, load).subscribe();
+  setInterval(load, 15000);
+})();
+</script>
+</body>
+</html>
