@@ -119,7 +119,12 @@ async function load() {
     if (pending) return;
     const next = { songs: a.data, mics: b.data || [], users: c.data || [], cfg: { ...CFG0, ...(d.data || {}) } };
     if (JSON.stringify(next) !== last) { S = next; render(); }
-  } catch (e) { if (!S.songs.length) $('#list').innerHTML = '<div class="empty">Не удалось загрузить данные</div>'; }
+  } catch (e) {
+    if (!S.songs.length) {
+      const why = /[^\x00-\x7F]/.test(SUPABASE_KEY) ? 'В SUPABASE_KEY остался текст-заглушка: вставь свой ключ' : (e && (e.message || e.details || e.hint)) || String(e);
+      $('#list').innerHTML = '<div class="empty">Не удалось загрузить данные<br><small style="display:block;margin-top:10px;word-break:break-word">' + esc(why) + '</small></div>';
+    }
+  }
 }
 
 const dis = t => '<div class="act"><button class="btn" disabled>' + t + '</button></div>';
